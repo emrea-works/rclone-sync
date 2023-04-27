@@ -56,12 +56,11 @@ rclone sync $folder_to_sync remote:$bucket_name$folder_to_sync \
 rm $folder_to_sync/$SECRET.encoded;
 
 # Save report in a file in the local dir.
-now=$(date +%Y-%m-%d-%H-%M)
-echo -e "Synced $now at remote:$bucket_name." >> .sync.log
+echo -e "Synced $(now) at remote:$bucket_name." >> .sync.log
 
 # Returns results
 echo -e "
-Sync ended $now, written in './.sync.log'.
+Sync ended $(now), written in './.sync.log'.
 Check by
 \e[36mrclone lsl remote:$bucket_name$folder_to_sync
 "
