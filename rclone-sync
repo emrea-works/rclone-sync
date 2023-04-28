@@ -4,6 +4,13 @@
 folder_to_sync=$(pwd)
 bucket_name='auto.sync'
 
+# Define the items to be excluded
+EXCLUDED=(
+  --exclude "/node_modules/**" 
+  --exclude "/'$SECRET'" 
+  --exclude "/.next/**" 
+)
+
 # Usage explanation and pause the script
 echo -e "
 Recommendation: 
@@ -22,7 +29,7 @@ Example:
 echo -e "Then, syncing \e[33m$folder_to_sync\e[0m... [y/N]? "; read answer
 case $answer in
   [Yy]|[Yy][Ee][Ss])
-    echo "Alright, syncing $folder_to_sync ..."
+    echo "Syncing $folder_to_sync ..."
     ;;
   [Nn]|[Nn][Oo])
     echo "Canceled, exiting."
@@ -47,10 +54,7 @@ fi
 
 # Run cloning command with specific arguments to exclude
 rclone sync $folder_to_sync remote:$bucket_name$folder_to_sync \
-  --progress --create-empty-src-dirs \
-  --exclude "/node_modules/**" \
-  --exclude "/$SECRET" \
-  --exclude "/.next/**" ;
+  --progress --create-empty-src-dirs "${EXCLUDED[@]}"
 
 # After sync, remove the encoded file from the local dir.
 rm $folder_to_sync/$SECRET.encoded;
@@ -58,9 +62,10 @@ rm $folder_to_sync/$SECRET.encoded;
 # Save report in a file in the local dir.
 echo -e "Synced $(now) at remote:$bucket_name." >> .sync.log
 
-# Returns results
-echo -e "
-Sync ended $(now), written in './.sync.log'.
-Check by
-\e[36mrclone lsl remote:$bucket_name$folder_to_sync
-"
+# Return sync report
+echo -e "\n🟢 Sync ended $(now), written in './.sync.log'. \n"
+
+# Check sync process
+rclone check $(pwd) remote:$bucket_name$folder_to_sync "${EXCLUDED[@]}"
+echo -e "\n🟡 $SECRET.encoded and .sync.log files are produced from this program, 
+not part of your synced folder.\n"
