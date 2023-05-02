@@ -6,9 +6,9 @@ bucket_name='auto.sync'
 
 # Define the items to be excluded
 EXCLUDED=(
-  --exclude "/node_modules/**" 
   --exclude "/'$SECRET'" 
-  --exclude "/.next/**" 
+  --exclude "node_modules/**" 
+  --exclude ".next/**" 
 )
 
 # Usage explanation and pause the script
@@ -25,21 +25,26 @@ Example:
 
 "
 
-# Prompt user if agrees the current folder is to be synced
-echo -e "Then, syncing \e[33m$folder_to_sync\e[0m... [y/N]? "; read answer
-case $answer in
-  [Yy]|[Yy][Ee][Ss])
-    echo "Syncing $folder_to_sync ..."
-    ;;
-  [Nn]|[Nn][Oo])
-    echo "Canceled, exiting."
-    exit 1
-    ;;
-  *)
-    echo "Not answered properly, exiting..."
-    exit 0
-    ;;
-esac
+
+if [[ $1 == '--no-prompt' ]]; then
+  echo "Syncing $folder_to_sync ..."
+else
+  # Prompt user if agrees the current folder is to be synced
+  echo -e "Then, syncing \e[33m$folder_to_sync\e[0m... [y/N]? "; read answer
+  case $answer in
+    [Yy]|[Yy][Ee][Ss])
+      echo "Syncing $folder_to_sync ..."
+      ;;
+    [Nn]|[Nn][Oo])
+      echo "Canceled, exiting."
+      exit 1
+      ;;
+    *)
+      echo "Not answered properly, exiting..."
+      exit 0
+      ;;
+  esac
+fi
 
 # Define a secret file needed to be encoded
 SECRET='.env'
