@@ -59,19 +59,19 @@ else
 fi
 
 # Run cloning command with specific arguments to exclude
-rclone sync $folder_to_sync remote:$bucket_name$folder_to_sync \
+rclone sync $folder_to_sync $remote:$bucket_name$folder_to_sync \
   --progress --create-empty-src-dirs "${EXCLUDED[@]}"
 
 # After sync, remove the encoded file from the local dir.
 rm $folder_to_sync/$SECRET.encoded;
 
 # Save report in a file in the local dir.
-echo -e "Synced $(now) at remote:$bucket_name." >> .sync.log
+echo -e "Synced $(now) at $remote:$bucket_name." >> .sync.log
 
 # Return sync report
 echo -e "\n🟢 Sync ended $(now), written in './.sync.log'. \n"
 
 # Check sync process
-rclone check $(pwd) remote:$bucket_name$folder_to_sync "${EXCLUDED[@]}"
+rclone check $(pwd) $remote:$bucket_name$folder_to_sync "${EXCLUDED[@]}"
 echo -e "\n🟡 $SECRET.encoded and .sync.log files are produced from this program, 
 not part of your synced folder.\n"
