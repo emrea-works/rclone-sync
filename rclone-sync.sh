@@ -45,7 +45,7 @@ else
       exit 0
       ;;
   esac
-fi
+fi 
 
 # Define a secret file needed to be encoded
 SECRET='.env'
@@ -60,7 +60,7 @@ fi
 
 # Run cloning command with specific arguments to exclude
 rclone sync $folder_to_sync $remote:$bucket_name$folder_to_sync \
-  --progress --create-empty-src-dirs "${EXCLUDED[@]}"
+  --progress --create-empty-src-dirs "${EXCLUDED[@]}" "$1" "$2" 
 
 # After sync, remove the encoded file from the local dir.
 rm $folder_to_sync/$SECRET.encoded;
