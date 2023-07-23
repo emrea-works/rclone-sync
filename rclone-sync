@@ -1,6 +1,7 @@
 #!/bin/bash
 
 # Defining the default syncing paths
+remote='remote'
 folder_to_sync=$(pwd)
 bucket_name='auto.sync'
 
