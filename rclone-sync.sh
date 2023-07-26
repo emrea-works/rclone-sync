@@ -7,17 +7,18 @@ bucket_name='auto.sync'
 
 # Define the items to be excluded
 EXCLUDED=(
-  --exclude "/'$SECRET'" 
-  --exclude "node_modules/**" 
-  --exclude ".next/**" 
+  --exclude "/'$SECRET'"
+  --exclude "node_modules/**"
+  --exclude ".next/**"
+  --exclude "target/debug/**"
 )
 
 # Usage explanation and pause the script
 echo -e "
-Recommendation: 
+Recommendation:
 
-This program takes the **current** path then saves the folder as the same 
-hierarchy at remote. So it's recommended to use it while inside the folder 
+This program takes the **current** path then saves the folder as the same
+hierarchy at remote. So it's recommended to use it while inside the folder
 which is desired to be synced. Plus, saves a log file in the current folder.
 
 Example:
@@ -26,26 +27,21 @@ Example:
 
 "
 
-
-if [[ $1 == '--no-prompt' ]]; then
-  echo "Syncing $folder_to_sync ..."
-else
-  # Prompt user if agrees the current folder is to be synced
-  echo -e "Then, syncing \e[33m$folder_to_sync\e[0m... [y/N]? "; read answer
-  case $answer in
-    [Yy]|[Yy][Ee][Ss])
-      echo "Syncing $folder_to_sync ..."
-      ;;
-    [Nn]|[Nn][Oo])
-      echo "Canceled, exiting."
-      exit 1
-      ;;
-    *)
-      echo "Not answered properly, exiting..."
-      exit 0
-      ;;
-  esac
-fi 
+# Prompt user if agrees the current folder is to be synced
+echo -e "Then, syncing \e[33m$folder_to_sync\e[0m... [y/N]? "; read answer
+case $answer in
+  [Yy]|[Yy][Ee][Ss])
+    echo "Syncing $folder_to_sync ..."
+    ;;
+  [Nn]|[Nn][Oo])
+    echo "Canceled, exiting."
+    exit 1
+    ;;
+  *)
+    echo "Not answered properly, exiting..."
+    exit 0
+    ;;
+esac
 
 # Define a secret file needed to be encoded
 SECRET='.env'
@@ -59,8 +55,18 @@ else
 fi
 
 # Run cloning command with specific arguments to exclude
-rclone sync $folder_to_sync $remote:$bucket_name$folder_to_sync \
-  --progress --create-empty-src-dirs "${EXCLUDED[@]}" "$1" "$2" 
+case $1 in
+  --no-git )
+    echo ".git folder is marked as excluded, won't be synced"
+    EXCLUDED+=(--exclude ".git/**")
+    rclone sync $folder_to_sync $remote:$bucket_name$folder_to_sync \
+      --progress --create-empty-src-dirs "${EXCLUDED[@]}"
+    ;;
+  * )
+    rclone sync $folder_to_sync $remote:$bucket_name$folder_to_sync \
+      --progress --create-empty-src-dirs "${EXCLUDED[@]}"
+    ;;
+esac
 
 # After sync, remove the encoded file from the local dir.
 rm $folder_to_sync/$SECRET.encoded;
@@ -73,5 +79,5 @@ echo -e "\n🟢 Sync ended $(now), written in './.sync.log'. \n"
 
 # Check sync process
 rclone check $(pwd) $remote:$bucket_name$folder_to_sync "${EXCLUDED[@]}"
-echo -e "\n🟡 $SECRET.encoded and .sync.log files are produced from this program, 
+echo -e "\n🟡 $SECRET.encoded and .sync.log files are produced from this program,
 not part of your synced folder.\n"
