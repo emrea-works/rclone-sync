@@ -26,22 +26,32 @@ Example:
   \e[36mcd /path/to/the/folder && rclone-sync ⎆\e[0m
 
 "
-
-# Prompt user if agrees the current folder is to be synced
-echo -e "Then, syncing \e[33m$folder_to_sync\e[0m... [y/N]? "; read answer
-case $answer in
-  [Yy]|[Yy][Ee][Ss])
-    echo "Syncing $folder_to_sync ..."
+# if first parameter given as '-y' then start script without prompting
+case $1 in
+  -y)
+    echo ".git folder is marked as excluded, won't be synced"
+    EXCLUDED+=(--exclude ".git/**")
+    rclone sync $folder_to_sync $remote:$bucket_name$folder_to_sync \
+      --progress --create-empty-src-dirs "${EXCLUDED[@]}"
     ;;
-  [Nn]|[Nn][Oo])
-    echo "Canceled, exiting."
-    exit 1
-    ;;
-  *)
-    echo "Not answered properly, exiting..."
-    exit 0
-    ;;
+  * )
+    # Prompt user if agrees the current folder is to be synced
+    echo -e "Then, syncing \e[33m$folder_to_sync\e[0m... [y/N]? "; read answer
+    case $answer in
+      [Yy]|[Yy][Ee][Ss])
+        echo "Syncing $folder_to_sync ..."
+        ;;
+      [Nn]|[Nn][Oo])
+        echo "Canceled, exiting."
+        exit 1
+        ;;
+      *)
+        echo "Not answered properly, exiting..."
+        exit 0
+        ;;
+    esac
 esac
+
 
 # Define a secret file needed to be encoded
 SECRET='.env'
