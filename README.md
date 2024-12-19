@@ -17,3 +17,16 @@ Also user gets a log file `.sync.log` in the same folder and a report text as a 
 rclone-sync has dependencies:
 - [now: gets date instantly in desired format](https://github.com/emrea-works/now)
 - [rclone](https://rclone.org/)
+
+## New Things
+
+More modular backup script is ready: **rclone Quick Copy**
+
+`$ rqcopy <remote_name> <bucket_name>`
+
+- Uses tar in zstd format to compress the entire directory, excluded defaults
+- Copies the compressed file into the remote bucket that is given as argument
+- Checks the file location at remote, presents a tree as an output at the end
+- Offers to cleanup the local directory from the excluded ones
+
+Bucket name term comes from S3 clouds, it can be used as root folder name in any remote. 
