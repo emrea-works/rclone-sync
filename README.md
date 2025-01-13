@@ -20,9 +20,14 @@ rclone-sync has dependencies:
 
 ## New Things
 
-More modular backup script is ready: **rclone Quick Copy**
+More modular and lighter syncing script is ready: **rcs**
 
-`$ rqcopy <remote_name> <bucket_name>`
+`$ rcs <remote_name> <bucket_name>`
+
+- Requires two arguments as local and destination paths
+- Displays sync report
+
+Another one is for backup with a compressed directory to close the project
 
 - Uses tar in zstd format to compress the entire directory, excluded defaults
 - Copies the compressed file into the remote bucket that is given as argument
